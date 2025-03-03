@@ -1,30 +1,3 @@
-/*
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
-
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
-
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
-*/
-
 import "./style.css";
   
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
@@ -34,6 +7,7 @@ import { EnvironmentHelper } from "@babylonjs/core/Helpers/environmentHelper.js"
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder.js";
+import { loadAssetContainerAsync } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core/scene.js";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial.js";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
@@ -54,7 +28,10 @@ import "@babylonjs/core/Materials/Node/Blocks";
 // XR ボタンを右下に表示させるために必須
 import "@babylonjs/core/Helpers/sceneHelpers";
 import { mainUVVaryingDeclaration } from "@babylonjs/core/Shaders/ShadersInclude/mainUVVaryingDeclaration";
- 
+
+// Enable Gaussian Splatting loader
+import "@babylonjs/loaders/SPLAT";
+
 const main = async () => {
   // Create a canvas element for rendering
   const app = document.querySelector<HTMLDivElement>("body");
@@ -92,7 +69,14 @@ const main = async () => {
   const rMat = new StandardMaterial("matR", scene);
   rMat.diffuseColor = new Color3(1.0, 0, 0);
   sphere.material = rMat;
-   
+  
+  // 3dgs
+  const gaussianSplatting = await loadAssetContainerAsync("https://raw.githubusercontent.com/sentomo/3dgs-castle-viewer/master/3dgs-castle-webxr/src/assets/KakegawaCastle.spz", scene);
+  gaussianSplatting.meshes[0].position.x = 50.0;
+  gaussianSplatting.meshes[0].position.y = 10.0;
+  gaussianSplatting.meshes[0].position.z = 40.0;
+  gaussianSplatting.meshes[0].rotation.y = 45.0;
+
   // Setup default WebXR experience
   // Use the enviroment floor to enable teleportation
   /*
