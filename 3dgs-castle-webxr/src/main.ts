@@ -46,15 +46,15 @@ const main = async () => {
   new HemisphericLight("light1", new Vector3(0, 2, 0), scene);
    
   // Create a default environment (skybox, ground mesh, etc)
-  /*
+  
   const envHelper = new EnvironmentHelper(
     {
-      skyboxSize: 30,
+      skyboxSize: 200,
       groundColor: new Color3(0.5, 0.5, 0.5),
     },
     scene,
   );
-  */
+  
    
   // Add a camera for the non-VR view in browser
   const camera = new ArcRotateCamera("Camera", -(Math.PI / 4) * 3, Math.PI / 4, 10, new Vector3(0, 0, 0), scene);
@@ -72,10 +72,11 @@ const main = async () => {
   
   // 3dgs
   const gaussianSplatting = await loadAssetContainerAsync("https://raw.githubusercontent.com/sentomo/3dgs-castle-viewer/master/3dgs-castle-webxr/src/assets/KakegawaCastle.spz", scene);
-  gaussianSplatting.meshes[0].position.x = 50.0;
-  gaussianSplatting.meshes[0].position.y = 10.0;
-  gaussianSplatting.meshes[0].position.z = 40.0;
+  gaussianSplatting.meshes[0].position.x = 76.0;
+  gaussianSplatting.meshes[0].position.y = 28.0;
+  gaussianSplatting.meshes[0].position.z = 66.0;
   gaussianSplatting.meshes[0].rotation.y = 45.0;
+  gaussianSplatting.meshes[0].scaling = new Vector3(2.0, 2.0, 2.0);
 
   // Setup default WebXR experience
   // Use the enviroment floor to enable teleportation
@@ -88,9 +89,10 @@ const main = async () => {
    
   const xr = await scene.createDefaultXRExperienceAsync({
     uiOptions: {
-      sessionMode: "immersive-ar",
+      sessionMode: "immersive-vr",
     },
     optionalFeatures: true,
+    floorMeshes: [envHelper.ground as Mesh],
   });
    
    
