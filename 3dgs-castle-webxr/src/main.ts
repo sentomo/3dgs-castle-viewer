@@ -1,5 +1,5 @@
 import "./style.css";
-  
+import { createClock } from "./components/clock";
 import { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera.js";
 import { Color3 } from "@babylonjs/core/Maths/math.color.js";
 import { Engine } from "@babylonjs/core/Engines/engine.js";
@@ -69,6 +69,9 @@ const main = async () => {
   const rMat = new StandardMaterial("matR", scene);
   rMat.diffuseColor = new Color3(1.0, 0, 0);
   sphere.material = rMat;
+
+  // Clock
+  const clock = createClock(scene);
   
   // 3dgs
   const gaussianSplatting = await loadAssetContainerAsync("https://raw.githubusercontent.com/sentomo/3dgs-castle-viewer/master/3dgs-castle-webxr/src/assets/KakegawaCastle.spz", scene);
