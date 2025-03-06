@@ -50,11 +50,16 @@ const main = async () => {
   const envHelper = new EnvironmentHelper(
     {
       skyboxSize: 200,
+      groundSize: 100,
       groundColor: new Color3(0.5, 0.5, 0.5),
     },
     scene,
   );
   
+  // Add upper ground
+  const upperGroundYellow = createUpperGround(new Vector3(0, 5.0, 0), "yellowMaterial", new Color3(1, 1, 0), scene);
+  const uppperGroundGreen = createUpperGround(new Vector3(10.0, 13.0, 10.0), "greenMaterial", new Color3(0, 1, 0), scene);
+
    
   // Add a camera for the non-VR view in browser
   const camera = new ArcRotateCamera("Camera", -(Math.PI / 4) * 3, Math.PI / 4, 10, new Vector3(0, 0, 0), scene);
@@ -65,9 +70,7 @@ const main = async () => {
   
   // 3dgs
   const gaussianSplatting = await loadAssetContainerAsync("https://raw.githubusercontent.com/sentomo/3dgs-castle-viewer/master/3dgs-castle-webxr/src/assets/KakegawaCastle.spz", scene);
-  gaussianSplatting.meshes[0].position.x = 76.0;
-  gaussianSplatting.meshes[0].position.y = 28.0;
-  gaussianSplatting.meshes[0].position.z = 66.0;
+  gaussianSplatting.meshes[0].position = new Vector3(76.0, 28.5, 66.0);
   gaussianSplatting.meshes[0].rotation.y = 45.0;
   gaussianSplatting.meshes[0].scaling = new Vector3(2.0, 2.0, 2.0);
 
@@ -85,7 +88,7 @@ const main = async () => {
       sessionMode: "immersive-vr",
     },
     optionalFeatures: true,
-    floorMeshes: [envHelper.ground as Mesh],
+    floorMeshes: [envHelper.ground as Mesh, upperGroundYellow, uppperGroundGreen],
   });
    
    
@@ -96,3 +99,14 @@ const main = async () => {
 }
  
 main();
+
+function createUpperGround(position: Vector3, materialName: string, color: Color3, scene: Scene) {
+  const extraGround = MeshBuilder.CreateGround(`extraGround_${materialName}`, { width: 30, height: 30 }, scene);
+  extraGround.position = position;
+  const extraGroundMaterial = new StandardMaterial(materialName, scene);
+  extraGroundMaterial.diffuseColor = color;
+  extraGroundMaterial.alpha = 0.5;
+  extraGround.material = extraGroundMaterial;
+
+  return extraGround;
+}
