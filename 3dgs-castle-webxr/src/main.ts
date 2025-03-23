@@ -10,7 +10,7 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder.js";
 import { loadAssetContainerAsync } from "@babylonjs/core";
 import { Scene } from "@babylonjs/core/scene.js";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial.js";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { Vector3 } from "@babylonjs/core/Maths";
 import { WebXRDefaultExperience } from "@babylonjs/core/XR/webXRDefaultExperience.js";
   
 // Required for EnvironmentHelper
@@ -55,11 +55,6 @@ const main = async () => {
     },
     scene,
   );
-  
-  // Add upper ground
-  const upperGroundYellow = createUpperGround(new Vector3(0, 5.0, 0), "yellowMaterial", new Color3(1, 1, 0), scene);
-  const uppperGroundGreen = createUpperGround(new Vector3(10.0, 13.0, 10.0), "greenMaterial", new Color3(0, 1, 0), scene);
-
    
   // Add a camera for the non-VR view in browser
   const camera = new ArcRotateCamera("Camera", -(Math.PI / 4) * 3, Math.PI / 4, 10, new Vector3(0, 0, 0), scene);
@@ -88,10 +83,59 @@ const main = async () => {
       sessionMode: "immersive-vr",
     },
     optionalFeatures: true,
-    floorMeshes: [envHelper.ground as Mesh, upperGroundYellow, uppperGroundGreen],
+    floorMeshes: [],
   });
+
+  // HMD Camera
+  const xrCamera = xr.baseExperience.camera;
+
+  // Movement settings
+  const flySpeed = 1.0;
+  const moveThreshold = 0.7;
+
+  // Horizontal rotation settings
+  const rotationAngle = Math.PI / 4; // 45°
+  const rotationCooldown = 500; // Vection sickness prevention
+  const rotationThreshold = 0.7;
+  let canRotate = true;
    
-   
+  // Controller Input
+  xr.input.onControllerAddedObservable.add((controller) => {
+    controller.onMotionControllerInitObservable.add((motionController) => {
+      const thumbstick = motionController.getComponent("xr-standard-thumbstick");
+
+      if (thumbstick) {
+        thumbstick.onAxisValueChangedObservable.add(() => {
+          const yValue = thumbstick.axes.y;
+          const xValue = thumbstick.axes.x;
+
+          const forward = xrCamera.getForwardRay().direction;
+          
+          if (yValue < -moveThreshold) {
+            xrCamera.position.addInPlace(forward.scale(flySpeed));
+          }
+
+          if (yValue > moveThreshold) {
+            xrCamera.position.addInPlace(forward.scale(-flySpeed));
+          }
+
+          if (canRotate) {
+            if (xValue < -rotationThreshold) {
+              xrCamera.rotation.y -= rotationAngle;
+              canRotate = false;
+              setTimeout(() => canRotate = true, rotationCooldown);
+            }
+            else if (xValue > rotationThreshold) {
+              xrCamera.rotation.y += rotationAngle;
+              canRotate = false;
+              setTimeout(() => canRotate = true, rotationCooldown);
+            }
+          }
+        });
+      }
+    });
+  });
+
   // Run render loop
   babylonEngine.runRenderLoop(() => {
     scene.render();
@@ -99,14 +143,3 @@ const main = async () => {
 }
  
 main();
-
-function createUpperGround(position: Vector3, materialName: string, color: Color3, scene: Scene) {
-  const extraGround = MeshBuilder.CreateGround(`extraGround_${materialName}`, { width: 30, height: 30 }, scene);
-  extraGround.position = position;
-  const extraGroundMaterial = new StandardMaterial(materialName, scene);
-  extraGroundMaterial.diffuseColor = color;
-  extraGroundMaterial.alpha = 0.5;
-  extraGround.material = extraGroundMaterial;
-
-  return extraGround;
-}
