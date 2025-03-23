@@ -65,7 +65,7 @@ const main = async () => {
   
   // 3dgs
   const gaussianSplatting = await loadAssetContainerAsync("https://raw.githubusercontent.com/sentomo/3dgs-castle-viewer/master/3dgs-castle-webxr/src/assets/KakegawaCastle.spz", scene);
-  gaussianSplatting.meshes[0].position = new Vector3(76.0, 28.5, 66.0);
+  gaussianSplatting.meshes[0].position = new Vector3(40.0, 38.5, 30.0);
   gaussianSplatting.meshes[0].rotation.y = 45.0;
   gaussianSplatting.meshes[0].scaling = new Vector3(2.0, 2.0, 2.0);
 
