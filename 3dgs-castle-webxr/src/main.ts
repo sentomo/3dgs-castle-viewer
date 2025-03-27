@@ -60,7 +60,7 @@ const main = async () => {
   camera.attachControl(true);
 
   // Clock
-  const clock = createClock(scene);
+  // const clock = createClock(scene);
   
   // 3dgs
   const gaussianSplatting = await loadAssetContainerAsync("https://raw.githubusercontent.com/sentomo/3dgs-castle-viewer/master/3dgs-castle-webxr/src/assets/KakegawaCastle.spz", scene);
